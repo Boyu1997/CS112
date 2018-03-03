@@ -1,0 +1,184 @@
+Lalonde 3 Ways
+
+Executive Summary:
+In this analysis, multivariate regression, logistic regression, and random forest are used to determine if the Lalonde treatment has a positive effect on the real income in 1978 for the observations. Two subgroups of with and without a degree are separated to produce a better analysis. Through three approaches, it is highly likely that the Lalonde treatment has a positive effect on increasing income, and it has a bigger impact on people with a degree.
+
+Import Library & Data
+```{r}
+library(Matching)
+library(arm)
+library(dismo)
+library(randomForest)
+data(lalonde)
+subgroup.nodegr <- subset(lalonde, nodegr == 1)
+subgroup.yesdegr <- subset(lalonde, nodegr == 0)
+```
+
+
+------
+Part 1
+------
+
+First, perform a linear regression using all variables, find those with lowing p-value to create the actual linear model, as a lower meaning a higher confidence to reject the null hypothesis (change in "re78" is not associated with the predictor, or no effect).
+```{r}
+lm.1 <- lm(re78 ~ age + educ + black + hisp + married + nodegr + re74 + re75 + u74 + u75 + treat, data=lalonde)
+summary(lm.1)
+```
+The result shows treat is a strong predictor for "re78", for the purpose of including at least three variables in the linear regression model, we will use p<0.1 as the cut-off point to include a variable in the prediction model. So, the new linear regression will use "educ", "black", "treat" as independent variables to predict the dependent variable "re78".
+```{r}
+lm.2 <- lm(re78 ~ educ + black + treat, data=lalonde)
+summary(lm.2)
+```
+The new regression model shows all of the three variables are strong predictors for "re78". Now, we will apply this linear regression model to predict "re78" in the no-degree and yes-degree subgroups.
+```{r}
+lm.nodegr.1 <- lm(re78 ~ educ + black + treat, data=subgroup.nodegr)
+summary(lm.nodegr.1)
+confint(lm.nodegr.1, level=0.95)
+lm.yesdegr.1 <- lm(re78 ~ educ + black + treat, data=subgroup.yesdegr)
+summary(lm.yesdegr.1)
+confint(lm.yesdegr.1, level=0.95)
+```
+Predicted by the linear regression model, the treatment effect for the no-degree subgroup is +1280.4, with 95% confidence interval between -84.1 and +2644.9; the treatment effect for the yes-degree subgroup is +2658.0, with 95% confidence interval between -365.5 and +5681.1. As we are using a linear regression model, the model itself assume a constant treatment effect in the same subgroup. The result is an indication that the Lalonde treatment has a positive treatment effect for both subgroups, but the treatment effect on the yes-degree subgroup is approximately twice comparing to the no-degree subgroup. However, it is worth noting that "treat" is a less powerful predictor in for the yes-degree subgroup, giving it a bigger confident interval. The lower bound of the 95% confidence interval of the yes-degree subgroup excite the lower bound of the 95% confident interval of the no-degree subgroup, meaning it is above 2.5% possibility that the treatment effect for the yes-degree subgroup is lower than the no-degree subgroup, decreasing the authority of the conclusion that treatment effect is more effective on the yes-degree subgroup.
+
+*Cross-Validation
+In attempt to impvove the model accrucy for the yes-degree subgroup, we can try cross-validation.
+```{r}
+k <- 10
+folds <- kfold(subgroup.yesdegr, k)
+min.SE.kfold <- Inf
+for (i in 1:k)
+{
+  set.train <- subgroup.yesdegr[which(folds!=i),]
+  set.test <- subgroup.yesdegr[which(folds==i),]
+  lm.yesdegr.kfold <- lm(re78 ~ educ + black + treat, data=set.train)
+  predict.kfold <- predict(lm.yesdegr.kfold, set.test)
+  SE.kfold = (sum((predict.kfold-set.test$re78)^2)/length(set.test))**(1/2)
+  if (SE.kfold < min.SE.kfold)
+  {
+    min.SE.kfold = SE.kfold
+    min.lm.yesdegr.kfold = lm.yesdegr.kfold
+  }
+}
+summary(min.lm.yesdegr.kfold)
+confint(min.lm.yesdegr.kfold, level=0.95)
+```
+The k-fold validation methord with k=10 sometimes shows an improvement on the p-value, but most of the times result in a higher p-value.
+```{r}
+k <- nrow(subgroup.yesdegr)
+folds <- kfold(subgroup.yesdegr, k)
+min.SE.kfold <- Inf
+for (i in 1:k)
+{
+  set.train <- subgroup.yesdegr[which(folds!=i),]
+  set.test <- subgroup.yesdegr[which(folds==i),]
+  lm.yesdegr.kfold <- lm(re78 ~ educ + black + treat, data=set.train)
+  predict.kfold <- predict(lm.yesdegr.kfold, set.test)
+  SE.kfold = (sum((predict.kfold-set.test$re78)^2)/length(set.test))**(1/2)
+  if (SE.kfold < min.SE.kfold)
+  {
+    min.SE.kfold = SE.kfold
+    min.lm.yesdegr.kfold = lm.yesdegr.kfold
+  }
+}
+summary(min.lm.yesdegr.kfold)
+confint(min.lm.yesdegr.kfold, level=0.95)
+```
+Using LOOCV, the special k-fold where k is the number of observations produce almost the same result as the linear regression on the entire yes-degree subset.
+
+
+------
+Part 2
+------
+
+In the new linear regression model, only the interaction term between "treat" and "nodegr" is included.
+```{r}
+lm.2 <- lm(re78 ~ I(treat*nodegr), data=lalonde)
+summary(lm.2)
+```
+The result shows the using the interaction term alone is not a good predictor. The interaction term is made out of two boolean variables, so this multiplication basically being if the observation is both "treat" and "nodegr", or any other condition. This interaction actually loses information. So, to give it prediction power, we have to include the "treat" and "nodegr" variables along with the interaction term.
+```{r}
+lm.3 <- lm(re78 ~ treat + nodegr + I(treat*nodegr), data=lalonde)
+summary(lm.3)
+confint(lm.3, level=0.95)
+lm.3.sim <- sim (lm.3)
+coef(lm.3.sim)
+plot (NA, NA, xlim=c(0, 1), ylim=c(-2000,6000),
+      xlab="nodegr", ylab="treatment effect",
+      main="lalonde program treatment effect")
+abline (h = 0, lwd=.5, lty=2)
+for (i in 1:100) {
+  abline (a = coef(lm.3.sim)[i,2], b = coef(lm.3.sim)[i,4],
+          lwd = .5, col = "gray")
+}
+abline (a = lm.3$coefficients[2], b = lm.3$coefficients[4],
+        lwd = 1, col = "black")
+```
+
+
+------
+Part 3
+------
+
+Unemployment is defined as people with no income, so observations with variable "re78" equals to 0 with have the feature "u78" equals to 1.
+```{r}
+lalonde$u78 = 1*(lalonde$re78 == 0)   # define u78 = 1 for those earned 0 income in 1978
+subgroup.nodegr = subset(lalonde, nodegr == 1)
+subgroup.yesdegr = subset(lalonde, nodegr == 0)   # update the subsets to include u78
+```
+In logistic regression, we can use all the variables as predictor for u78.
+```{r}
+glm.nodegr <- glm(u78 ~ age + educ + black + hisp + married + re74 + re75 + u74 + u75 + treat, data=subgroup.nodegr, family=binomial)
+summary(glm.nodegr)
+confint(glm.nodegr, level=0.95)
+
+glm.yesdegr <- glm(u78 ~ age + educ + black + hisp + married + re74 + re75 + u74 + u75 + treat, data=subgroup.yesdegr, family=binomial)
+summary(glm.yesdegr)
+confint(glm.yesdegr, level=0.95)
+```
+The logistic regression produce a reasonable result, and we can use this prediction to caltulate the predicted treatment result.
+```{r}
+u78.mean.nodegr.notreat.glm <- mean(subset(glm.nodegr$fitted.values, subgroup.nodegr$treat == 0))
+u78.mean.nodegr.yestreat.glm <- mean(subset(glm.nodegr$fitted.values, subgroup.nodegr$treat == 1))
+u78.nodegr.treateffect.glm <- u78.mean.nodegr.yestreat.glm - u78.mean.nodegr.notreat.glm
+u78.nodegr.treateffect.glm
+
+u78.mean.yesdegr.notreat.glm <- mean(subset(glm.yesdegr$fitted.values, subgroup.yesdegr$treat == 0))
+u78.mean.yesdegr.yestreat.glm <- mean(subset(glm.yesdegr$fitted.values, subgroup.yesdegr$treat == 1))
+u78.yesdegr.treateffect.glm <- u78.mean.yesdegr.yestreat.glm - u78.mean.yesdegr.notreat.glm
+u78.yesdegr.treateffect.glm
+```
+The treatment effect (decrese in unemployement reat in year 1978) is -0.09529672 for the no-degree subgroup and -0.1451335 for the yes-degree subgroup.
+```{r}
+u78.mean.nodegr.notreat <- mean(subset(subgroup.nodegr$u78, subgroup.nodegr$treat == 0))
+u78.mean.nodegr.yestreat <- mean(subset(subgroup.nodegr$u78, subgroup.nodegr$treat == 1))
+u78.nodegr.treateffect <- u78.mean.nodegr.yestreat - u78.mean.nodegr.notreat
+u78.nodegr.treateffect
+
+u78.mean.yesdegr.notreat <- mean(subset(subgroup.yesdegr$u78, subgroup.yesdegr$treat == 0))
+u78.mean.yesdegr.yestreat <- mean(subset(subgroup.yesdegr$u78, subgroup.yesdegr$treat == 1))
+u78.yesdegr.treateffect <- u78.mean.yesdegr.yestreat - u78.mean.yesdegr.notreat
+u78.yesdegr.treateffect
+```
+However, if we run calculate the mean difference of "u78" using the acctural data, we will abtain the exact same result as using the logistic regression model. Regardless, the conclusion show the Lalond treatment can decrease the unemployement rate, but it is more effective for the yes-degree subgroup.
+
+
+------
+Part 4
+------
+To start with, build a random forest using all variables for the entire set.
+```{r}
+rf <- randomForest(re78 ~ age + educ + black + hisp + married + re74 + re75 + u74 + u75 + treat, data=lalonde, ntree=2000, importance=T)
+varImpPlot(rf)
+```
+Variable "treat" is ranked in the 8th place, meaning is not a very significant contributer to the tree accuracy. The positive value of the MSE, mean decrease accuracy, shows "treat" dose help increase the tree accuracy.
+```{r}
+rf.nodegr <- randomForest(re78 ~ age + educ + black + hisp + married + re74 + re75 + u74 + u75 + treat, data=subgroup.nodegr, ntree=2000, importance=T)
+varImpPlot(rf.nodegr)
+```
+For the no-degree subset, "treat" is ranked at the 9th place, but with a negative MSE value, meaning adding treat will acctuly harm the tree accuracy.
+```{r}
+rf.yesdegr <- randomForest(re78 ~ age + educ + black + hisp + married + re74 + re75 + u74 + u75 + treat, data=subgroup.yesdegr, ntree=2000, importance=T)
+varImpPlot(rf.yesdegr)
+```
+In the yes-degree subgroup, "treat" is ranked at the 4th place and the MSE value is positive, showing evedence that "treat" has a posstive impact on real income of 1978 for the yes-degree subgroup.
+
