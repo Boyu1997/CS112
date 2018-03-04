@@ -1,3 +1,6 @@
+setwd("/Users/boyu/Documents/Minerva/Second\ Year/Sesond\ Semester/CS112/R\ Code")
+getwd()
+
 city.names <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
 observed.turnout = c(18, 30, 14, 52, 24, 29, 48, 49, 17, 30)
 

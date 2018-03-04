@@ -143,4 +143,4 @@ fit <- cforest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare +
                controls=cforest_unbiased(ntree=2000, mtry=3))
 Prediction <- predict(fit, test, OOB=TRUE, type = "response")
 submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
-write.csv(submit, file = "conditionalinference trees.csv", row.names = FALSE)
+write.csv(submit, file = "conditionalinferencetrees.csv", row.names = FALSE)
