@@ -46,7 +46,7 @@ fit <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked, da
 plot(fit)
 text(fit)
 
-install.packages("RGtk2", type="source")
+# install.packages("RGtk2", type="source")
 # install.packages('rattle')
 # install.packages('rpart.plot')
 # install.packages('RColorBrewer')
