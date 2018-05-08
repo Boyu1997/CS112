@@ -1,0 +1,93 @@
+					Codebook and Datasources for
+
+Koehler, Sebastian; König, Thomas, 2014, "Replication data for: Fiscal Governance in the Eurozone: How effectively does the Stability and Growth Pact limit governmental debt in the Euro countries?", http://dx.doi.org/10.7910/DVN/24640 Harvard Dataverse Network [Distributor] V1 [Version]
+
+
+Variable 	Description										Source
+--------------------------------------------------------------------------------------------------------------
+"ccode"        	Correlates of War numerical country code
+"Year"         	Year
+"country"      	Name of Country
+"eu"            Dummy variable indicating EU membership
+"oecd"          Dummy variable indicating OECD membership
+"Debt.GDP"      Debt-to-GDP ratio 									[9]
+"pop65"        	Population aged over 65 years (Percentage of total population)				[9]
+"pop015"        Population aged 0-15 years (Percentage of total population)				[9]
+"unempl"       	Unemployment rate									[9]
+"system"       	Type of political system 				 				[1]
+"yrcurnt"      	Years left in current term								[1]	
+"allhouse"     	Indicator of Unified/Divided Government							[1]	
+"legelec"      	Legislative election in year t								[1]
+"pluralty"     	Plurality electoral system								[1]
+"pr"          	Proportional representation								[1]
+"checks"       	Numerical index of Checks and Balances							[6]
+"fri"          	Fiscal Rules Index 									[2]
+"DeltaGDP"    	Growthrate of GDP									[8]	
+"deltaMFP"     	Growthrate of Multi Factor Productivity							[9]
+"deltaLP"      	Growthrate of Labor Productivity							[9]
+"healthexp"    	Expenditures on Health Care								[9]	
+"GDP"          	Gross Domestic Product (Expenditure approach)						[6]
+"taxrev"       	General Govenment: Total tax revenue							[9]
+"taxrevnoss"   	Total tax revenue (excluding Social Security)						[9]
+"CO2em"	       	CO2 Emissions   									[11]
+"FDI"          	Foreign Direct Investment								[11]
+"deltaGDP"     	Growthrate of GDP									[11]
+"GINI"         	GINI Index										[11]
+"inflation"    	Inflationrate										[11]
+"poverty"      	Headcount of Population above Poverty line						[11]	
+"unemployment" 	Unemploymentrate									[11]
+"POP"          	Total population									[11]
+"openc"        	Openness										[5]
+"open1"        	Openness (expenditure approach)								[9]
+"familyexp"    	Expenditure on Families									[9]
+"polconiii"    	POLCONIII Index										[5]
+"polconv"      	POLCONV Index										[4]
+"ideology"     	Potrafke Index of Ideology								[10]
+"maj"          	Majority margin										[1]
+"herftot"      	Herfindahl Index									[1]
+"lDebt.GDP"    	Lag of Debt-to-GDP ratio								[11]
+"raegov"       	Rae fractionalisation Index (Government)						[1]
+"raetot"       	Rae fractionalisation Index (total)							[1]
+"Gdebtgdpr"    	Debt-to-GDP ration (General Government, ESA95 definition)				[3]
+"edpdeficit"   	Budget deficit according to ESA95 definition						[3]
+"deficit"      	Deficit											[9]
+"primbaltot2"  	Primary balance										[9]
+
+
+
+
+
+
+
+
+
+Sources:
+--------------------------------------------------------------------------------------------------------------
+
+[1] Beck, Clarke, Groff, Keefer, and Walsh. 2010. “New Tools in Comparative Political Economy: The Database of Political Institutions.” World Bank Economic Review 15 (1): 165–176.
+
+[2] European Commission, 2006. Public Finances in EMU 2006. European Economy No. 3/2006. European Commission, Brussels.
+
+[3] EUROSTAT. 2013. Government finance statistics (GFS). European Commission, Brussels.   
+
+[4] Henisz, Witold J. 2002. “The Institutional Environment for Infrastructure Investment.” Industrial and Corporate Change 11 (2): 355–89. 
+
+[5] Henisz, W. J. 2000. “The Institutional Environment for Economic Growth.” Economics & Politics 12 (1): 1–31.
+
+[6] Alan Heston, Robert Summers and Bettina Aten, Penn World Table Version 7.1, Center for International Comparisons of Production, Income and Prices at the University of Pennsylvania, Nov 2012.
+
+[7] Keefer, Philip, and David Stasavage. 2003. “The Limits of Delegation: Veto Players, Central Bank Independence, and the Credibility of Monetary Policy.” The American Political Science Review 97 (3): 407–23.
+
+[8] OECD. 2012. "Main Economic Indicators", Volume 2012, Issue 2, OECD Publishing.
+http://dx.doi.org/10.1787/mei-v2012-02-en. 
+
+[9] OECD. 2013. "OECD Economic Outlook No. 94", OECD Economic Outlook: Statistics and Projections (database). doi: 10.1787/data-00676-en.
+
+[10] Potrafke, Niklas. 2009. “Did Globalization Restrict Partisan Politics? An Empirical Evaluation of   Social Expenditures in a Panel of OECD Countries.” Public Choice 140 (1-2): 105–24.
+
+[11] Reinhart, Carmen M., and Kenneth S. Rogoff. 2010. “Growth in a Time of Debt.” American Economic Review 100 (2): 573–78.
+
+[12] World Bank. 2013. World Development Indicators 2013. Washington, DC: World Bank. doi: 10.1596/978-0-8213-9824-1. 
+
+
+
